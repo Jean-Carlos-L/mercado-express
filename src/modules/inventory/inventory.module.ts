@@ -25,6 +25,6 @@ import { ProductModule } from '../products/product.module';
       useClass: PrismaAlertRepository,
     },
   ],
-  exports: [AdjustStockUseCase, FindAlertsUseCase],
+  exports: [AdjustStockUseCase, FindAlertsUseCase, ALERT_REPOSITORY],
 })
 export class InventoryModule {}
