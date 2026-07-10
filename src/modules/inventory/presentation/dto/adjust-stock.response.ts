@@ -1,44 +1,47 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 class AdjustStockProductResponse {
-  @ApiProperty()
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   id!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 60 })
   currentStock!: number;
 }
 
 class AdjustStockTransactionResponse {
-  @ApiProperty()
+  @ApiProperty({ example: 'b1c2d3e4-f5a6-7890-bcde-f12345678901' })
   id!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   productId!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 10 })
   quantity!: number;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Restocking from supplier' })
   reason!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'INCOMING',
+    enum: ['INCOMING', 'OUTGOING'],
+  })
   transactionType!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
   createdAt!: Date;
 }
 
 class AdjustStockAlertResponse {
-  @ApiProperty()
+  @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
   id!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   productId!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'LOW_STOCK' })
   type!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'ACTIVE' })
   status!: string;
 }
 

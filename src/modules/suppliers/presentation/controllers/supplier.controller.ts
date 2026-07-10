@@ -20,7 +20,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SupplierResponse } from '../dto/supplier.response';
-import { ApiDefaultErrors } from 'src/shared/presentation/decorators/api-default-errors.decorator';
+import { ApiValidationErrors } from 'src/shared/presentation/decorators/api-validation-errors.decorator';
+import { ApiSupplierAlreadyExistsError } from 'src/shared/presentation/decorators/api-supplier-already-exists.decorator';
+import { ApiInternalServerError } from 'src/shared/presentation/decorators/api-internal-server-error.decorator';
 import { PaginationRequest } from 'src/shared/pagination/dto/pagination.request';
 import { PaginatedResponseType } from 'src/shared/pagination/dto/paginated-response';
 
@@ -36,12 +38,16 @@ export class SupplierController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create a new supplier',
+    description:
+      'Creates a new supplier. The name must be unique across all suppliers.',
   })
   @ApiCreatedResponse({
     description: 'Supplier created successfully.',
     type: SupplierResponse,
   })
-  @ApiDefaultErrors()
+  @ApiValidationErrors()
+  @ApiSupplierAlreadyExistsError()
+  @ApiInternalServerError()
   async create(@Body() request: CreateSupplierRequest) {
     const supplier = await this.createSupplierUseCase.execute(request);
 
@@ -52,12 +58,14 @@ export class SupplierController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'List all suppliers with pagination',
+    description:
+      'Returns a paginated list of all suppliers. This is a read-only endpoint that does not produce domain errors.',
   })
   @ApiOkResponse({
     description: 'Paginated list of suppliers.',
     type: PaginatedResponseType(SupplierResponse),
   })
-  @ApiDefaultErrors()
+  @ApiInternalServerError()
   async findAll(@Query() pagination: PaginationRequest) {
     const { data, metadata } =
       await this.findAllSuppliersUseCase.execute(pagination);

@@ -13,6 +13,7 @@ export class FindAlertsRequest extends PaginationRequest {
   @ApiPropertyOptional({
     example: 'ACTIVE',
     enum: ['ACTIVE', 'RESOLVED'],
+    description: 'Filter alerts by status',
   })
   @IsOptional()
   @IsString()

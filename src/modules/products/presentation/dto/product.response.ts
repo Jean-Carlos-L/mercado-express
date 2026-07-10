@@ -1,27 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ProductResponse {
-  @ApiProperty()
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   id!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Laptop Dell Inspiron 15' })
   name!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'LAP-001' })
   sku!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   categoryId!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '8b7b9f58-2a9c-4fd4-9d5f-67b6d4d7d3f9' })
   supplierId!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 2500 })
   price!: number;
 
-  @ApiProperty()
+  @ApiProperty({ example: 50 })
   currentStock!: number;
 
-  @ApiProperty()
+  @ApiProperty({ example: 10 })
   minStock!: number;
 }
