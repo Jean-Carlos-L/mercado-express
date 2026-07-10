@@ -12,22 +12,22 @@ export class ErrorResponse {
   code!: string;
 
   @ApiProperty({
-    example: 'Invalid request body',
+    example: 'Validation failed',
   })
   message!: string;
 
   @ApiProperty({
-    example: 'POST',
+    example: 'GET',
   })
   method!: string;
 
   @ApiProperty({
-    example: '/products',
+    example: '/resource',
   })
   path!: string;
 
   @ApiProperty({
-    example: '2023-01-01T00:00:00.000Z',
+    example: '2025-01-01T00:00:00.000Z',
   })
   timestamp!: string;
 }

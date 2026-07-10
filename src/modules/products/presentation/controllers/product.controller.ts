@@ -6,7 +6,9 @@ import { ProductPresenter } from '../presenters/product.presenter';
 
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ProductResponse } from '../dto/product.response';
-import { ApiDefaultErrors } from 'src/shared/presentation/decorators/api-default-errors.decorator';
+import { ApiValidationErrors } from 'src/shared/presentation/decorators/api-validation-errors.decorator';
+import { ApiProductAlreadyExistsError } from 'src/shared/presentation/decorators/api-product-already-exists.decorator';
+import { ApiInternalServerError } from 'src/shared/presentation/decorators/api-internal-server-error.decorator';
 
 @ApiTags('Products')
 @Controller('products')
@@ -17,12 +19,16 @@ export class ProductController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create a new product',
+    description:
+      'Creates a new product. The SKU must be unique across all products.',
   })
   @ApiCreatedResponse({
     description: 'Product created successfully.',
     type: ProductResponse,
   })
-  @ApiDefaultErrors()
+  @ApiValidationErrors()
+  @ApiProductAlreadyExistsError()
+  @ApiInternalServerError()
   async create(@Body() request: CreateProductRequest) {
     const product = await this.createProductUseCase.execute(request);
 
