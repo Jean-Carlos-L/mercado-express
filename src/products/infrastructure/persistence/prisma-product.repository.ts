@@ -13,6 +13,18 @@ export class PrismaProductRepository implements ProductRepository {
     return products.map((p) => ProductMapper.toDomain(p));
   }
 
+  async findById(id: string): Promise<Product | null> {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+    });
+
+    if (!product) {
+      return null;
+    }
+
+    return ProductMapper.toDomain(product);
+  }
+
   async findBySku(sku: string): Promise<Product | null> {
     const product = await this.prisma.product.findUnique({
       where: { sku },
