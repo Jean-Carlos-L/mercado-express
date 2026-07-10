@@ -3,11 +3,34 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './shared/presentation/filters/global-exception.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.use(
+    helmet({
+      hidePoweredBy: true,
+      noSniff: true,
+      referrerPolicy: {
+        policy: 'no-referrer',
+      },
+      frameguard: {
+        action: 'deny',
+      },
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
+
+  app.enableCors({
+    origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [
+      'http://localhost:3000',
+      'http://localhost:5173',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: false,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -16,6 +39,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Swagger
   const config = new DocumentBuilder()
