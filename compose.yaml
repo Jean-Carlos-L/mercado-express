@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mercado-express-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mercado_express
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_mercado_express:/var/lib/postgresql/data
+    networks:
+      - mercado-express-network
+
+  # api:
+  #   build: .
+  #   container_name: mercado-express-api
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - mercado-express-network
+
+volumes:
+  postgres_mercado_express:
+
+networks:
+  mercado-express-network:
+    driver: bridge

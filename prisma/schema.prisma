@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TransactionType {
+  INCOMING
+  OUTGOING
+}
+
+enum TypeAlert {
+  LOW_STOCK
+}
+
+enum AlertStatus {
+  ACTIVE
+  RESOLVED
+}
+
+enum PurchaseOrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RECEIVED
+}
+
+enum PurchaseOrderSource {
+  MANUAL
+  LOW_STOCK_ALERT
+}
+
+model Category {
+  id         String  @id @default(uuid()) @db.Uuid
+  name       String  @db.VarChar(100)
+  is_deleted Boolean @default(false)
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Supplier {
+  id         String  @id @default(uuid()) @db.Uuid
+  name       String  @db.VarChar(100)
+  is_deleted Boolean @default(false)
+
+  products        Product[]
+  purchase_orders PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+model Product {
+  id            String  @id @default(uuid()) @db.Uuid
+  name          String  @db.VarChar(100)
+  sku           String  @db.VarChar(20)
+  category_id   String  @db.Uuid
+  supplier_id   String  @db.Uuid
+  price         Decimal @db.Decimal(10, 2)
+  current_stock Int
+  min_stock     Int
+
+  category               Category               @relation(fields: [category_id], references: [id])
+  supplier               Supplier               @relation(fields: [supplier_id], references: [id])
+  alerts                 Alert[]
+  inventory_transactions InventoryTransaction[]
+  purchase_orders        PurchaseOrder[]
+
+  @@unique([sku])
+  @@index([category_id])
+  @@index([supplier_id])
+  @@index([current_stock])
+  @@map("products")
+}
+
+model InventoryTransaction {
+  id               String          @id @default(uuid()) @db.Uuid
+  product_id       String          @db.Uuid
+  quantity         Int
+  reason           String          @db.VarChar(255)
+  transaction_type TransactionType
+  created_at       DateTime        @default(now())
+
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@index([product_id])
+  @@index([transaction_type])
+  @@map("inventory_transactions")
+}
+
+model Alert {
+  id         String      @id @default(uuid()) @db.Uuid
+  product_id String      @db.Uuid
+  type       TypeAlert
+  status     AlertStatus @default(ACTIVE)
+
+  product        Product        @relation(fields: [product_id], references: [id])
+  purchase_order PurchaseOrder?
+
+  @@index([product_id])
+  @@index([status])
+  @@index([type])
+  @@map("alerts")
+}
+
+model PurchaseOrder {
+  id          String              @id @default(uuid()) @db.Uuid
+  product_id  String              @db.Uuid
+  quantity    Int
+  supplier_id String              @db.Uuid
+  status      PurchaseOrderStatus @default(PENDING)
+  source      PurchaseOrderSource @default(MANUAL)
+  alert_id    String?             @unique @db.Uuid
+  created_at  DateTime            @default(now())
+
+  product  Product  @relation(fields: [product_id], references: [id])
+  supplier Supplier @relation(fields: [supplier_id], references: [id])
+  alert    Alert?   @relation(fields: [alert_id], references: [id])
+
+  @@index([product_id])
+  @@index([supplier_id])
+  @@index([alert_id])
+  @@index([status])
+  @@map("purchase_orders")
+}
