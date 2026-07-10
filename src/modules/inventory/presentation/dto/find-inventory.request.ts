@@ -20,6 +20,7 @@ export class FindInventoryRequest extends PaginationRequest {
 
   @ApiPropertyOptional({
     example: true,
+    description: 'Filter products that have at least one active alert',
   })
   @IsOptional()
   @IsBoolean()
@@ -28,6 +29,7 @@ export class FindInventoryRequest extends PaginationRequest {
 
   @ApiPropertyOptional({
     example: 0,
+    description: 'Filter products with currentStock >= minStock',
   })
   @IsOptional()
   @IsInt()
@@ -37,6 +39,7 @@ export class FindInventoryRequest extends PaginationRequest {
 
   @ApiPropertyOptional({
     example: 100,
+    description: 'Filter products with currentStock <= maxStock',
   })
   @IsOptional()
   @IsInt()

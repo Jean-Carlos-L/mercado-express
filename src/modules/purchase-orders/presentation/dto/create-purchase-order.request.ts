@@ -33,6 +33,8 @@ export class CreatePurchaseOrderRequest {
   @ApiProperty({
     example: 'MANUAL',
     enum: ['MANUAL', 'LOW_STOCK_ALERT'],
+    description:
+      'Order origin. MANUAL for user-created orders, LOW_STOCK_ALERT for system-generated orders',
   })
   @IsString()
   @IsIn(['MANUAL', 'LOW_STOCK_ALERT'])
@@ -40,6 +42,8 @@ export class CreatePurchaseOrderRequest {
 
   @ApiPropertyOptional({
     example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    description:
+      'Required when source is LOW_STOCK_ALERT. Must not be provided when source is MANUAL',
   })
   @ValidateIf(
     (obj: CreatePurchaseOrderRequest) => obj.source === 'LOW_STOCK_ALERT',

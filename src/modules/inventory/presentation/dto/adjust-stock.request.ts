@@ -20,6 +20,7 @@ export class AdjustStockRequest {
   @ApiProperty({
     example: 'INCOMING',
     enum: ['INCOMING', 'OUTGOING'],
+    description: 'INCOMING increases stock, OUTGOING decreases stock',
   })
   @IsString()
   @IsIn(['INCOMING', 'OUTGOING'])

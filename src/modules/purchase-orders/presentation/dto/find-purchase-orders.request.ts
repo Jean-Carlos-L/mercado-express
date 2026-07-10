@@ -20,6 +20,7 @@ export class FindPurchaseOrdersRequest extends PaginationRequest {
   @ApiPropertyOptional({
     example: 'PENDING',
     enum: ['PENDING', 'APPROVED', 'REJECTED', 'RECEIVED'],
+    description: 'Filter orders by status',
   })
   @IsOptional()
   @IsString()
