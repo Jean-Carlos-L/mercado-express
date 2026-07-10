@@ -1,3 +1,4 @@
+import { Alert } from '../entities/alert.entity';
 import { InventoryTransaction } from '../entities/inventory-transaction.entity';
 
 export const INVENTORY_REPOSITORY = 'INVENTORY_REPOSITORY';
@@ -11,5 +12,6 @@ export interface InventoryRepository {
   }): Promise<{
     product: { id: string; currentStock: number };
     transaction: InventoryTransaction;
+    alert: Alert | null;
   } | null>;
 }

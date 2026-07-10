@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { Alert } from '../../domain/entities/alert.entity';
 import { InventoryTransaction } from '../../domain/entities/inventory-transaction.entity';
 import { InsufficientStockForAdjustmentError } from '../../domain/errors/insufficient-stock-for-adjustment.error';
 import {
@@ -19,11 +20,12 @@ export class AdjustStockUseCase {
     private readonly inventoryRepository: InventoryRepository,
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
-  ) { }
+  ) {}
 
   async execute(dto: AdjustStockDto): Promise<{
     product: { id: string; currentStock: number };
     transaction: InventoryTransaction;
+    alert: Alert | null;
   }> {
     const product = await this.productRepository.findById(dto.productId);
 
