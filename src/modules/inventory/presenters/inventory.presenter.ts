@@ -2,6 +2,8 @@ import { Alert } from 'src/modules/inventory/domain/entities/alert.entity';
 import { InventoryTransaction } from 'src/modules/inventory/domain/entities/inventory-transaction.entity';
 import { AdjustStockResponse } from 'src/modules/inventory/presentation/dto/adjust-stock.response';
 import { AlertResponse } from 'src/modules/inventory/presentation/dto/alert.response';
+import { InventoryProductResponse } from 'src/modules/inventory/presentation/dto/inventory-product.response';
+import { Product } from 'src/modules/products/domain/entities/product.entity';
 
 export class InventoryPresenter {
   static toAdjustStockResponse(result: {
@@ -46,5 +48,28 @@ export class InventoryPresenter {
 
   static toAlertResponseList(alerts: Alert[]): AlertResponse[] {
     return alerts.map((a) => InventoryPresenter.toAlertResponse(a));
+  }
+
+  static toInventoryProductResponse(
+    product: Product,
+  ): InventoryProductResponse {
+    return {
+      id: product.id,
+      name: product.name,
+      sku: product.sku,
+      categoryId: product.categoryId,
+      supplierId: product.supplierId,
+      price: product.price,
+      currentStock: product.currentStock,
+      minStock: product.minStock,
+    };
+  }
+
+  static toInventoryProductResponseList(
+    products: Product[],
+  ): InventoryProductResponse[] {
+    return products.map((p) =>
+      InventoryPresenter.toInventoryProductResponse(p),
+    );
   }
 }
