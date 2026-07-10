@@ -1,3 +1,4 @@
+import { Alert } from 'src/modules/inventory/domain/entities/alert.entity';
 import { InventoryTransaction } from 'src/modules/inventory/domain/entities/inventory-transaction.entity';
 import { InventoryRepository } from 'src/modules/inventory/domain/repositories/inventory.repository';
 import { PrismaService } from 'src/shared/database/prisma.service';
@@ -7,6 +8,7 @@ import { Injectable } from '@nestjs/common';
 type AdjustStockResult = {
   product: { id: string; currentStock: number };
   transaction: InventoryTransaction;
+  alert: Alert | null;
 };
 
 @Injectable()
@@ -43,12 +45,50 @@ export class PrismaInventoryRepository implements InventoryRepository {
 
       const product = await tx.product.findUniqueOrThrow({
         where: { id: params.productId },
-        select: { id: true, current_stock: true },
+        select: { id: true, current_stock: true, min_stock: true },
       });
+
+      const activeAlert = await tx.alert.findFirst({
+        where: {
+          product_id: params.productId,
+          status: 'ACTIVE',
+          type: 'LOW_STOCK',
+        },
+      });
+
+      let alert: Alert | null = null;
+
+      if (product.current_stock <= product.min_stock && !activeAlert) {
+        const created = await tx.alert.create({
+          data: {
+            product_id: params.productId,
+            type: 'LOW_STOCK',
+            status: 'ACTIVE',
+          },
+        });
+        alert = {
+          id: created.id,
+          productId: created.product_id,
+          type: created.type,
+          status: created.status,
+        };
+      } else if (product.current_stock > product.min_stock && activeAlert) {
+        const updated = await tx.alert.update({
+          where: { id: activeAlert.id },
+          data: { status: 'RESOLVED' },
+        });
+        alert = {
+          id: updated.id,
+          productId: updated.product_id,
+          type: updated.type,
+          status: updated.status,
+        };
+      }
 
       return {
         product: { id: product.id, currentStock: product.current_stock },
         transaction: InventoryTransactionMapper.toDomain(transaction),
+        alert,
       };
     });
 

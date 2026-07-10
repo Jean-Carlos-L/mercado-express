@@ -28,10 +28,27 @@ class AdjustStockTransactionResponse {
   createdAt!: Date;
 }
 
+class AdjustStockAlertResponse {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  productId!: string;
+
+  @ApiProperty()
+  type!: string;
+
+  @ApiProperty()
+  status!: string;
+}
+
 export class AdjustStockResponse {
   @ApiProperty({ type: AdjustStockProductResponse })
   product!: AdjustStockProductResponse;
 
   @ApiProperty({ type: AdjustStockTransactionResponse })
   transaction!: AdjustStockTransactionResponse;
+
+  @ApiProperty({ type: AdjustStockAlertResponse, nullable: true })
+  alert!: AdjustStockAlertResponse | null;
 }
