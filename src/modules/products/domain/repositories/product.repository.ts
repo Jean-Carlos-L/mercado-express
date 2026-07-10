@@ -9,6 +9,16 @@ export interface ProductRepository {
 
   findBySku(sku: string): Promise<Product | null>;
 
+  findByFilters(params: {
+    categoryId?: string;
+    supplierId?: string;
+    hasActiveAlert?: boolean;
+    minStock?: number;
+    maxStock?: number;
+    page: number;
+    pageSize: number;
+  }): Promise<{ data: Product[]; total: number }>;
+
   save(product: Product): Promise<Product>;
 
   update(product: Product): Promise<Product>;
