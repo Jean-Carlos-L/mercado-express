@@ -76,7 +76,7 @@ jobs:
           script: |
             set -e
 
-            cd /opt/mercado-express
+            cd ./opt/mercado-express
 
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
               | docker login \
