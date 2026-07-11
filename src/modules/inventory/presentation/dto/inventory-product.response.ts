@@ -13,8 +13,14 @@ export class InventoryProductResponse {
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   categoryId!: string;
 
+  @ApiProperty({ example: 'Electrónica' })
+  categoryName!: string;
+
   @ApiProperty({ example: '8b7b9f58-2a9c-4fd4-9d5f-67b6d4d7d3f9' })
   supplierId!: string;
+
+  @ApiProperty({ example: 'Dell Colombia' })
+  supplierName!: string;
 
   @ApiProperty({ example: 2500 })
   price!: number;

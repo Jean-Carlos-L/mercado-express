@@ -1,5 +1,10 @@
 import { GlobalExceptionFilter } from './global-exception.filter';
-import { ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { DomainException } from '../../domain/errors/domain.exception';
 import { Request, Response } from 'express';
 
@@ -125,7 +130,10 @@ describe('GlobalExceptionFilter', () => {
 
   describe('HttpException handling', () => {
     it('should handle HttpException with string response', () => {
-      const exception = new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+      const exception = new HttpException(
+        'Bad request',
+        HttpStatus.BAD_REQUEST,
+      );
 
       filter.catch(exception, mockHost);
 
@@ -140,7 +148,10 @@ describe('GlobalExceptionFilter', () => {
 
     it('should handle HttpException with object response containing message array', () => {
       const exception = new HttpException(
-        { message: ['field1 is required', 'field2 is invalid'], error: 'Validation' },
+        {
+          message: ['field1 is required', 'field2 is invalid'],
+          error: 'Validation',
+        },
         HttpStatus.BAD_REQUEST,
       );
 

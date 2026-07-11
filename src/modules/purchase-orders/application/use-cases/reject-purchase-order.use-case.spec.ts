@@ -21,7 +21,7 @@ describe('RejectPurchaseOrderUseCase', () => {
       createdAt: new Date(),
       rejectionReason: null,
       ...overrides,
-    } as PurchaseOrder;
+    };
   };
 
   beforeEach(() => {

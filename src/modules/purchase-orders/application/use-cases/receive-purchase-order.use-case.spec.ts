@@ -22,7 +22,7 @@ describe('ReceivePurchaseOrderUseCase', () => {
       createdAt: new Date(),
       rejectionReason: null,
       ...overrides,
-    } as PurchaseOrder;
+    };
   };
 
   beforeEach(() => {

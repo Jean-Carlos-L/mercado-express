@@ -73,6 +73,10 @@ export class PrismaProductRepository implements ProductRepository {
     const [products, total] = await Promise.all([
       this.prisma.product.findMany({
         where,
+        include: {
+          category: { select: { name: true } },
+          supplier: { select: { name: true } },
+        },
         skip: (params.page - 1) * params.pageSize,
         take: params.pageSize,
         orderBy: { name: 'asc' },

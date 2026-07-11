@@ -1,8 +1,13 @@
 import { Product as PrismaProduct } from '@prisma/client';
 import { Product } from '../../../domain/entities/product.entity';
 
+type PrismaProductWithRelations = PrismaProduct & {
+  category?: { name: string } | null;
+  supplier?: { name: string } | null;
+};
+
 export class ProductMapper {
-  static toDomain(prismaProduct: PrismaProduct): Product {
+  static toDomain(prismaProduct: PrismaProductWithRelations): Product {
     return Product.restore({
       id: prismaProduct.id,
       name: prismaProduct.name,
@@ -12,6 +17,8 @@ export class ProductMapper {
       price: Number(prismaProduct.price),
       currentStock: prismaProduct.current_stock,
       minStock: prismaProduct.min_stock,
+      categoryName: prismaProduct.category?.name,
+      supplierName: prismaProduct.supplier?.name,
     });
   }
 
