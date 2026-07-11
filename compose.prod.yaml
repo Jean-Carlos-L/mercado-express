@@ -5,14 +5,27 @@ services:
 
     restart: unless-stopped
 
-    ports:
-      - '${PORT:-3000}:3000'
-
     env_file:
       - .env
 
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
-        max-file: '3'
+  caddy:
+    image: caddy:2.10-alpine
+    container_name: mercado-express-caddy
+
+    restart: unless-stopped
+
+    depends_on:
+      - api
+
+    ports:
+      - '80:80'
+      - '443:443'
+
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
