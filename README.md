@@ -1,18 +1,31 @@
 # Mercado Express
 
-API REST para la gestión de inventario y órdenes de compra. Desarrollada como proyecto de evaluación técnica demostrando Clean Architecture, diseño orientado a dominio y operaciones transaccionales de inventario en NestJS.
+API REST para la gestión de inventario y órdenes de compra. Desarrollada como prueba técnica demostrando Clean Architecture, diseño orientado a dominio, operaciones transaccionales de inventario y despliegue automatizado en AWS.
 
 ## Tabla de Contenidos
 
 - [Descripción](#descripción)
 - [Tecnologías](#tecnologías)
 - [Arquitectura](#arquitectura)
+  - [Por qué Clean Architecture](#por-qué-clean-architecture)
+  - [Responsabilidades de cada Capa](#responsabilidades-de-cada-capa)
+  - [Capa Transversal](#capa-transversal-shared)
 - [Estructura del Proyecto](#estructura-del-proyecto)
-- [Requisitos](#requisitos)
-- [Variables de Entorno](#variables-de-entorno)
 - [Instalación Local](#instalación-local)
+  - [Requisitos Previos](#requisitos-previos)
+  - [Clonar el Repositorio](#1-clonar-el-repositorio)
+  - [Configurar Variables de Entorno](#2-configurar-variables-de-entorno)
+  - [Ejecutar con Docker Compose](#3-ejecutar-con-docker-compose)
+  - [Aplicar Migraciones](#4-aplicar-migraciones)
+  - [Generar Cliente Prisma](#5-generar-cliente-prisma)
+  - [Iniciar la Aplicación](#6-iniciar-la-aplicación)
+  - [Inicio Rápido](#inicio-rápido)
 - [Documentación de la API](#documentación-de-la-api)
 - [Pruebas](#pruebas)
+- [Despliegue](#despliegue)
+  - [Flujo de Despliegue](#flujo-de-despliegue)
+  - [Rol de cada Servicio](#rol-de-cada-servicio)
+  - [Variables de Entorno de Producción](#variables-de-entorno-de-producción)
 - [Reglas de Negocio](#reglas-de-negocio)
 - [Decisiones Técnicas](#decisiones-técnicas)
 - [Mejoras Futuras](#mejoras-futuras)
@@ -34,21 +47,27 @@ Mercado Express es un sistema backend que gestiona **productos**, **categorías*
 
 ## Tecnologías
 
-| Tecnología                                                          | Versión                  | Propósito                                    |
-| ------------------------------------------------------------------- | ------------------------ | -------------------------------------------- |
-| [NestJS](https://nestjs.com/)                                       | 11                       | Framework de aplicación                      |
-| [TypeScript](https://www.typescriptlang.org/)                       | 5.7                      | Lenguaje (módulo nodeNext)                   |
-| [Prisma](https://www.prisma.io/)                                    | 7                        | ORM con `@prisma/adapter-pg` (driver nativo) |
-| [PostgreSQL](https://www.postgresql.org/)                           | 16                       | Base de datos relacional                     |
-| [Docker](https://www.docker.com/)                                   | Compose 3.9              | Contenedor de base de datos local            |
-| [Jest](https://jestjs.io/)                                          | 30                       | Pruebas unitarias, de integración y E2E      |
-| [Supertest](https://github.com/ladakh/supertest)                    | 7                        | Aserciones HTTP para pruebas E2E             |
-| [Swagger](https://swagger.io/)                                      | vía `@nestjs/swagger` 11 | Documentación de la API en `/docs`           |
-| [Helmet](https://helmetjs.github.io/)                               | 8                        | Headers de seguridad HTTP                    |
-| [class-validator](https://github.com/typestack/class-validator)     | 0.15                     | Validación de DTOs de entrada                |
-| [class-transformer](https://github.com/typestack/class-transformer) | 0.5                      | Transformación de objetos                    |
-| [ESLint](https://eslint.org/)                                       | 9                        | Linting (flat config, type-checked)          |
-| [Prettier](https://prettier.io/)                                    | 3                        | Formateo de código                           |
+| Tecnología                                                          | Propósito                                    |
+| ------------------------------------------------------------------- | -------------------------------------------- |
+| [NestJS](https://nestjs.com/)                                       | Framework de aplicación                      |
+| [TypeScript](https://www.typescriptlang.org/)                       | Lenguaje (módulo nodeNext)                   |
+| [Prisma](https://www.prisma.io/)                                    | ORM con `@prisma/adapter-pg` (driver nativo) |
+| [PostgreSQL](https://www.postgresql.org/)                           | Base de datos relacional                     |
+| [Docker](https://www.docker.com/)                                   | Contenedorización multi-etapa                |
+| [Docker Compose](https://docs.docker.com/compose/)                  | Orquestación de servicios (dev y prod)       |
+| [Jest](https://jestjs.io/)                                          | Pruebas unitarias, de integración y E2E      |
+| [Supertest](https://github.com/ladakh/supertest)                    | Aserciones HTTP para pruebas E2E             |
+| [Swagger](https://swagger.io/)                                      | Documentación de la API en `/docs`           |
+| [Helmet](https://helmetjs.github.io/)                               | Headers de seguridad HTTP                    |
+| [class-validator](https://github.com/typestack/class-validator)     | Validación de DTOs de entrada                |
+| [class-transformer](https://github.com/typestack/class-transformer) | Transformación de objetos                    |
+| [ESLint](https://eslint.org/)                                       | Linting (flat config, type-checked)          |
+| [Prettier](https://prettier.io/)                                    | Formateo de código                           |
+| [GitHub Actions](https://github.com/features/actions)               | CI/CD automatizado                           |
+| [Amazon ECR](https://aws.amazon.com/ecr/)                           | Registro de imágenes Docker                  |
+| [Amazon EC2](https://aws.amazon.com/ec2/)                           | Infraestructura de cómputo en la nube        |
+| [Amazon RDS](https://aws.amazon.com/rds/)                           | Base de datos PostgreSQL gestionada          |
+| [Caddy](https://caddyserver.com/)                                   | Reverse proxy con HTTPS automático           |
 
 ---
 
@@ -56,12 +75,17 @@ Mercado Express es un sistema backend que gestiona **productos**, **categorías*
 
 El proyecto sigue los principios de **Clean Architecture** adaptados al ecosistema NestJS, organizado en cuatro capas distintas por módulo.
 
-### Por qué Clean Architecture
+### ¿Por qué Clean Architecture?
 
-- **Separación de responsabilidades**: Las reglas de negocio están desacopladas de los detalles del framework (Express, Prisma, HTTP).
-- **Testabilidad**: Las entidades de dominio y los casos de uso pueden probarse con unit tests sin infraestructura.
-- **Reemplazabilidad**: La implementación del repositorio en Prisma puede cambiarse por otro ORM o SQL puro sin afectar la lógica de negocio.
-- **Escalabilidad**: Los nuevos módulos siguen la misma estructura, haciendo el código predecible y consistente.
+Elegí Clean Architecture porque desde el inicio planteé este proyecto como la base de un sistema de inventario más completo, no únicamente como un CRUD. Sabía que el dominio iba a crecer con nuevas funcionalidades y reglas de negocio, por lo que preferí una estructura que facilitara su evolución y mantenimiento en el tiempo.
+
+Uno de mis principales objetivos fue mantener la lógica del negocio separada de la infraestructura. Reglas como impedir que el stock quede negativo, mantener una única alerta activa por producto, validar los cambios de estado de una orden o cerrar automáticamente una alerta cuando el inventario se recupera pertenecen al dominio del negocio y no deberían depender del framework, del ORM o de la base de datos utilizada.
+
+Esta arquitectura también me permitió concentrar en los casos de uso operaciones que implican varios pasos. Por ejemplo, al ajustar el inventario no solo se actualiza el stock, sino que también se registra el movimiento y se evalúa si es necesario crear o cerrar una alerta. De forma similar, al recibir una orden de compra se incrementa el inventario, se registra el movimiento correspondiente y se resuelve automáticamente la alerta asociada cuando aplica. Mantener esa coordinación en un solo lugar hace que el comportamiento del sistema sea más fácil de entender y mantener.
+
+Otro aspecto importante fue reducir el acoplamiento con la infraestructura. Gracias al uso de interfaces y repositorios, la lógica del negocio permanece independiente de PostgreSQL y Prisma, lo que facilita reemplazar estas tecnologías en el futuro sin afectar el dominio. Además, si el proyecto continúa creciendo y en algún momento surge la necesidad de evolucionar hacia una arquitectura de microservicios, esta separación facilitaría ese proceso al tener las responsabilidades claramente definidas desde el inicio.
+
+Finalmente, aunque para un proyecto pequeño esta arquitectura podría parecer excesiva, considero que en este caso fue una decisión acertada. La cantidad de reglas de negocio, la interacción entre varias entidades y la posibilidad de seguir ampliando el sistema justifican una estructura que priorice la mantenibilidad, la escalabilidad y la claridad del código desde el inicio.
 
 ### Responsabilidades de cada Capa
 
@@ -88,68 +112,53 @@ shared/
 
 ```
 mercado-express/
+├── .github/
+│   └── workflows/
+│       └── deploy.yaml              # CI/CD: build, test, push a ECR, deploy a EC2
+├── docker/
+│   └── entrypoint.sh                # Migraciones automáticas al iniciar el contenedor
 ├── prisma/
-│   └── schema.prisma              # Esquema de base de datos, enums, índices
+│   └── schema.prisma                # Esquema de base de datos, enums, índices
 ├── src/
-│   ├── main.ts                    # Bootstrap: pipes, filters, Swagger, CORS, Helmet
-│   ├── app.module.ts              # Módulo raíz
+│   ├── main.ts                      # Bootstrap: pipes, filters, Swagger, CORS, Helmet
+│   ├── app.module.ts                # Módulo raíz
 │   ├── modules/
-│   │   ├── categories/            # CRUD de categorías (domain, application, infrastructure, presentation)
-│   │   ├── suppliers/             # CRUD de proveedores (misma estructura)
-│   │   ├── products/              # CRUD de productos con unicidad de SKU
-│   │   ├── inventory/             # Ajustes de stock + gestión de alertas
-│   │   └── purchase-orders/       # Ciclo de vida de órdenes (crear/aprobar/rechazar/recibir)
+│   │   ├── categories/              # CRUD de categorías
+│   │   ├── suppliers/               # CRUD de proveedores
+│   │   ├── products/                # CRUD de productos con unicidad de SKU
+│   │   ├── inventory/               # Ajustes de stock + gestión de alertas
+│   │   └── purchase-orders/         # Ciclo de vida de órdenes de compra
 │   └── shared/
-│       ├── database/              # PrismaService
-│       ├── domain/errors/         # DomainException, ErrorResponse
-│       ├── pagination/            # Tipos genéricos de paginación
-│       └── presentation/          # GlobalExceptionFilter, decoradores Swagger
+│       ├── database/                # PrismaService
+│       ├── domain/errors/           # DomainException, ErrorResponse
+│       ├── pagination/              # Tipos genéricos de paginación
+│       └── presentation/            # GlobalExceptionFilter, decoradores Swagger
 ├── test/
-│   ├── helpers/                   # Limpieza de BD de prueba, fábrica de apps de test
-│   ├── modules/                   # Archivos de pruebas E2E e integración
-│   ├── jest-e2e.json              # Configuración de pruebas E2E
-│   └── jest-integration.json      # Configuración de pruebas de integración
-├── compose.yaml                   # Docker Compose (PostgreSQL 16)
-├── prisma.config.ts               # Configuración del cliente Prisma
-├── eslint.config.mjs              # Configuración flat de ESLint
-├── tsconfig.json                  # Configuración de TypeScript
-└── package.json                   # Scripts y dependencias
+│   ├── helpers/                     # Limpieza de BD de prueba, fábrica de apps de test
+│   ├── modules/                     # Pruebas E2E por módulo
+│   ├── jest-e2e.json                # Configuración de pruebas E2E
+│   └── jest-integration.json        # Configuración de pruebas de integración
+├── compose.yaml                     # Docker Compose (desarrollo local)
+├── compose.prod.yaml                # Docker Compose (producción)
+├── Dockerfile                       # Build multi-etapa (Node 22 Alpine)
+├── eslint.config.mjs                # Configuración flat de ESLint
+├── tsconfig.json                    # Configuración de TypeScript
+└── package.json                     # Scripts y dependencias
 ```
-
----
-
-## Requisitos
-
-| Software                | Versión                       |
-| ----------------------- | ----------------------------- |
-| Node.js                 | >= 18.0 (recomendado: 20 LTS) |
-| npm                     | >= 9.0                        |
-| PostgreSQL              | 16                            |
-| Docker + Docker Compose | >= 20.10                      |
-
----
-
-## Variables de Entorno
-
-Crea un archivo `.env` en la raíz del proyecto:
-
-```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mercado_express?schema=public"
-PORT=3000
-ALLOWED_ORIGINS="http://localhost:3000,http://localhost:5173"
-```
-
-| Variable          | Descripción                      | Valor por defecto                             |
-| ----------------- | -------------------------------- | --------------------------------------------- |
-| `DATABASE_URL`    | Cadena de conexión a PostgreSQL  | Obligatoria                                   |
-| `PORT`            | Puerto de escucha del servidor   | `3000`                                        |
-| `ALLOWED_ORIGINS` | Orígenes CORS separados por coma | `http://localhost:3000,http://localhost:5173` |
 
 ---
 
 ## Instalación Local
 
-### 1. Clonar el repositorio
+### Requisitos Previos
+
+| Software                | Versión                       |
+| ----------------------- | ----------------------------- |
+| Node.js                 | >= 18.0 (recomendado: 22 LTS) |
+| npm                     | >= 9.0                        |
+| Docker + Docker Compose | >= 20.10                      |
+
+### 1. Clonar el Repositorio
 
 ```bash
 # HTTPS
@@ -161,48 +170,75 @@ git clone git@github.com:Jean-Carlos-L/mercado-express.git
 cd mercado-express
 ```
 
-### 2. Instalar dependencias
-
-```bash
-npm install
-```
-
-### 3. Configurar variables de entorno
+### 2. Configurar Variables de Entorno
 
 ```bash
 cp .env.example .env
-# Editar .env con las credenciales de tu base de datos
 ```
 
-### 4. Iniciar PostgreSQL
+Edita el archivo `.env` con la configuración de tu base de datos:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mercado_express?schema=public"
+PORT=3000
+ALLOWED_ORIGINS="http://localhost:3000,http://localhost:5173"
+NODE_ENV=development
+```
+
+| Variable          | Descripción                      | Valor por defecto                             |
+| ----------------- | -------------------------------- | --------------------------------------------- |
+| `DATABASE_URL`    | Cadena de conexión a PostgreSQL  | Obligatoria                                   |
+| `PORT`            | Puerto de escucha del servidor   | `3000`                                        |
+| `ALLOWED_ORIGINS` | Orígenes CORS separados por coma | `http://localhost:3000,http://localhost:5173` |
+| `NODE_ENV`        | Entorno de ejecución             | `development`                                 |
+
+### 3. Ejecutar con Docker Compose
 
 ```bash
 docker compose up -d
 ```
 
-Esto inicia PostgreSQL 16 en el puerto `5432` con la base de datos `mercado_express`.
+Esto inicia:
 
-### 5. Ejecutar migraciones
+- **PostgreSQL 16** en el puerto `5432` con la base de datos `mercado_express`.
+- **API** en el puerto `3000` (solo si usas `compose.yaml` completo).
+
+El servicio `postgres` incluye un healthcheck que verifica que la base de datos esté lista antes de aceptar conexiones.
+
+### 4. Aplicar Migraciones
 
 ```bash
 npx prisma migrate dev
 ```
 
-### 6. Iniciar la aplicación
+Esto crea todas las tablas definidas en `prisma/schema.prisma`: `categories`, `suppliers`, `products`, `inventory_transactions`, `alerts` y `purchase_orders`.
+
+### 5. Generar Cliente Prisma
+
+```bash
+npx prisma generate
+```
+
+Genera el cliente Prisma optimizado en `node_modules/.prisma/client`. Este paso es necesario para que TypeScript reconozca los tipos generados por Prisma.
+
+### 6. Iniciar la Aplicación
 
 ```bash
 npm run start:dev
 ```
 
-La API estará disponible en `http://localhost:3000`.
+La API estará disponible en `http://localhost:3000`. La documentación Swagger se encuentra en `http://localhost:3000/docs`.
 
-### Inicio rápido (todo en uno)
+### Inicio Rápido
 
 ```bash
-docker compose up -d
+git clone git@github.com:Jean-Carlos-L/mercado-express.git
+cd mercado-express
 cp .env.example .env
 npm install
+docker compose up -d
 npx prisma migrate dev
+npx prisma generate
 npm run start:dev
 ```
 
@@ -242,15 +278,17 @@ El proyecto incluye tres niveles de pruebas:
 
 ### Pruebas Unitarias
 
-Ejecuta lógica de entidades de dominio y casos de uso (no requiere base de datos):
+Validan la lógica de entidades de dominio y casos de uso sin dependencia de base de datos:
 
 ```bash
 npm run test:unit
 ```
 
+Cobertura: entidades (`Product`), casos de uso (`CreatePurchaseOrder`, `ApprovePurchaseOrder`, `RejectPurchaseOrder`, `ReceivePurchaseOrder`, `AdjustStock`) y `GlobalExceptionFilter`.
+
 ### Pruebas de Integración
 
-Ejecuta pruebas de implementación de repositorios contra una base de datos PostgreSQL real:
+Validan los repositorios Prisma contra una base de datos PostgreSQL real:
 
 ```bash
 # Asegurar que la BD de prueba existe y las migraciones están aplicadas
@@ -258,13 +296,17 @@ npm run test:integration:setup
 npm run test:integration
 ```
 
+Cobertura: `PrismaInventoryRepository` (queries SQL raw, alertas), `PrismaPurchaseOrderRepository`, `PrismaAlertRepository`, `PrismaProductRepository`.
+
 ### Pruebas E2E
 
-Ejecuta pruebas del ciclo completo de peticiones HTTP:
+Validan los flujos completos desde peticiones HTTP hasta la base de datos:
 
 ```bash
 npm run test:e2e
 ```
+
+Cobertura: endpoints críticos de inventario, órdenes de compra y productos.
 
 ### Cobertura
 
@@ -273,6 +315,51 @@ npm run test:cov
 ```
 
 Los reportes de cobertura se generan en el directorio `coverage/`.
+
+---
+
+## Despliegue
+
+El proyecto se despliega automáticamente mediante un pipeline CI/CD que integra GitHub Actions, Docker, Amazon ECR y Amazon EC2.
+
+### Flujo de Despliegue
+
+```
+Push a master
+    ↓
+GitHub Actions
+    ↓
+Instalar dependencias + Prisma generate
+    ↓
+Ejecutar tests (npm test)
+    ↓
+Build imagen Docker (multi-etapa)
+    ↓
+Push a Amazon ECR (tags: latest + SHA)
+    ↓
+SSH a Amazon EC2
+    ↓
+docker compose pull (nueva imagen desde ECR)
+    ↓
+docker compose up -d
+    ↓
+docker image prune (limpiar imágenes anteriores)
+    ↓
+Nueva versión desplegada
+```
+
+### Rol de cada Servicio
+
+| Servicio           | Rol en la Arquitectura                                                                                                                                                                                    |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **GitHub Actions** | Orquesta el pipeline CI/CD. Ejecuta tests, construye la imagen Docker y la push a ECR. Luego conecta vía SSH a EC2 para ejecutar el pull y reinicio.                                                      |
+| **Amazon ECR**     | Registro privado de imágenes Docker. Almacena las versiones construidas por GitHub Actions y las sirve a EC2 durante el despliegue.                                                                       |
+| **Amazon EC2**     | Instancia de cómputo donde se ejecuta la aplicación. Recibe la nueva imagen vía Docker Compose pull, ejecuta las migraciones automáticamente (entrypoint.sh) y expone la API al público.                  |
+| **Amazon RDS**     | Base de datos PostgreSQL gestionada por AWS. Proporciona alta disponibilidad, backups automáticos y escalabilidad sin administración del motor de base de datos.                                          |
+| **Docker**         | Contenedoriza la aplicación en una imagen multi-etapa (build + producción). Reduce el tamaño de la imagen final y aísla la aplicación del sistema operativo.                                              |
+| **Docker Compose** | Define los servicios de la aplicación tanto en desarrollo (`compose.yaml`) como en producción (`compose.prod.yaml`). En producción, gestiona el pull de la imagen desde ECR y el reinicio del contenedor. |
+| **Caddy**          | Reverse proxy con generación automática de certificados HTTPS vía Let's Encrypt. Gestiona el tráfico entrante, termina TLS y lo proxea a la aplicación NestJS.                                            |
+| **Let's Encrypt**  | Autoridad de certificación que emite certificados SSL/TLS gratuitos. Caddy lo integra automáticamente para habilitar HTTPS en el dominio personalizado.                                                   |
 
 ---
 
@@ -335,3 +422,11 @@ Los ajustes de stock usan `$executeRawUnsafe` con una cláusula `WHERE` en lugar
 ### Decoradores de Error en Swagger
 
 Cada endpoint del controller usa decoradores Swagger específicos (ej. `@ApiProductAlreadyExistsError()`) en lugar de respuestas de error genéricas. Esto produce documentación precisa y específica por endpoint en Swagger UI.
+
+### Build Multi-Etapa en Docker
+
+El `Dockerfile` utiliza dos etapas: una de build con todas las dependencias de desarrollo y una de producción solo con las dependencias necesarias. Esto reduce significativamente el tamaño de la imagen final y mejora la seguridad al minimizar el software expuesto.
+
+### Entrypoint con Migraciones Automáticas
+
+El `entrypoint.sh` ejecuta `npx prisma migrate deploy` antes de iniciar la aplicación. Esto garantiza que la base de datos esté actualizada cada vez que se despliega una nueva versión, sin intervención manual.
