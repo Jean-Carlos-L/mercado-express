@@ -87,19 +87,31 @@ describe('Product Entity', () => {
 
   describe('hasLowStock', () => {
     it('should return true when current stock is equal to min stock', () => {
-      const product = Product.create({ ...defaultProps, currentStock: 5, minStock: 5 });
+      const product = Product.create({
+        ...defaultProps,
+        currentStock: 5,
+        minStock: 5,
+      });
 
       expect(product.hasLowStock()).toBe(true);
     });
 
     it('should return true when current stock is below min stock', () => {
-      const product = Product.create({ ...defaultProps, currentStock: 3, minStock: 5 });
+      const product = Product.create({
+        ...defaultProps,
+        currentStock: 3,
+        minStock: 5,
+      });
 
       expect(product.hasLowStock()).toBe(true);
     });
 
     it('should return false when current stock is above min stock', () => {
-      const product = Product.create({ ...defaultProps, currentStock: 10, minStock: 5 });
+      const product = Product.create({
+        ...defaultProps,
+        currentStock: 10,
+        minStock: 5,
+      });
 
       expect(product.hasLowStock()).toBe(false);
     });

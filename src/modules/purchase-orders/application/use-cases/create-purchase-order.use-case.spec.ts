@@ -29,7 +29,7 @@ describe('CreatePurchaseOrderUseCase', () => {
       decreaseStock: jest.fn(),
       hasLowStock: jest.fn(),
       ...overrides,
-    } as unknown as Product;
+    };
   };
 
   const mockAlert = (overrides?: { id?: string; productId?: string }) => ({
@@ -212,7 +212,9 @@ describe('CreatePurchaseOrderUseCase', () => {
 
   describe('quantity validation (minStock * 2)', () => {
     it('should throw InvalidQuantityForOrderError when quantity is less than 2x minStock', async () => {
-      productRepository.findById.mockResolvedValue(mockProduct({ minStock: 10 }));
+      productRepository.findById.mockResolvedValue(
+        mockProduct({ minStock: 10 }),
+      );
 
       const dto: CreatePurchaseOrderDto = {
         productId: 'prod-uuid',
@@ -227,7 +229,9 @@ describe('CreatePurchaseOrderUseCase', () => {
     });
 
     it('should throw InvalidQuantityForOrderError when quantity equals 2x minStock - 1', async () => {
-      productRepository.findById.mockResolvedValue(mockProduct({ minStock: 10 }));
+      productRepository.findById.mockResolvedValue(
+        mockProduct({ minStock: 10 }),
+      );
 
       const dto: CreatePurchaseOrderDto = {
         productId: 'prod-uuid',

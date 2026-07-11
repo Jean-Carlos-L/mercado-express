@@ -11,6 +11,8 @@ export class Product {
     public price: number,
     public currentStock: number,
     public minStock: number,
+    public readonly categoryName?: string,
+    public readonly supplierName?: string,
   ) {}
 
   static create(props: {
@@ -43,6 +45,8 @@ export class Product {
     price: number;
     currentStock: number;
     minStock: number;
+    categoryName?: string;
+    supplierName?: string;
   }): Product {
     return new Product(
       props.id,
@@ -53,6 +57,8 @@ export class Product {
       props.price,
       props.currentStock,
       props.minStock,
+      props.categoryName,
+      props.supplierName,
     );
   }
 

@@ -25,7 +25,7 @@ describe('AdjustStockUseCase', () => {
       decreaseStock: jest.fn(),
       hasLowStock: jest.fn(),
       ...overrides,
-    } as unknown as Product;
+    };
   };
 
   beforeEach(() => {
