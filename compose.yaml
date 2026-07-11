@@ -1,37 +1,45 @@
-version: '3.9'
-
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: mercado-express-postgres
-    restart: always
+    container_name: mercado-express-db
+    restart: unless-stopped
+
     environment:
+      POSTGRES_DB: mercado_express
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mercado_express
+
     ports:
       - '5432:5432'
-    volumes:
-      - postgres_mercado_express:/var/lib/postgresql/data
-    networks:
-      - mercado-express-network
 
-  # api:
-  #   build: .
-  #   container_name: mercado-express-api
-  #   restart: always
-  #   ports:
-  #     - "3000:3000"
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - mercado-express-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d mercado_express']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: mercado-express-api
+
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    ports:
+      - '3000:3000'
+
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/mercado_express
 
 volumes:
-  postgres_mercado_express:
-
-networks:
-  mercado-express-network:
-    driver: bridge
+  postgres_data:
