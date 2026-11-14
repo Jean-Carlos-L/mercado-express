@@ -47,4 +47,10 @@ export default tseslint.config(
       'no-duplicate-imports': 'error',
     },
   },
+  {
+    files: ['**/*.spec.ts', '**/*.e2e-spec.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
 );

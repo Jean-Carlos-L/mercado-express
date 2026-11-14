@@ -18,7 +18,7 @@ export async function seedCategory(
   const name = data.name ?? `Category ${crypto.randomUUID().slice(0, 8)}`;
 
   await prisma.$executeRawUnsafe(
-    'INSERT INTO categories (id, name, is_deleted) VALUES ($1, $2, false)',
+    'INSERT INTO categories (id, name, is_deleted) VALUES ($1::uuid, $2, false)',
     id,
     name,
   );
@@ -33,7 +33,7 @@ export async function seedSupplier(
   const name = data.name ?? `Supplier ${crypto.randomUUID().slice(0, 8)}`;
 
   await prisma.$executeRawUnsafe(
-    'INSERT INTO suppliers (id, name, is_deleted) VALUES ($1, $2, false)',
+    'INSERT INTO suppliers (id, name, is_deleted) VALUES ($1::uuid, $2, false)',
     id,
     name,
   );
@@ -69,7 +69,7 @@ export async function seedProduct(data: {
 
   await prisma.$executeRawUnsafe(
     `INSERT INTO products (id, name, sku, category_id, supplier_id, price, current_stock, min_stock)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+     VALUES ($1::uuid, $2, $3, $4::uuid, $5::uuid, $6::numeric, $7::int, $8::int)`,
     id,
     name,
     sku,
@@ -103,7 +103,7 @@ export async function seedAlert(data: {
   const status = data.status ?? 'ACTIVE';
 
   await prisma.$executeRawUnsafe(
-    'INSERT INTO alerts (id, product_id, type, status) VALUES ($1, $2, $3, $4)',
+    'INSERT INTO alerts (id, product_id, type, status) VALUES ($1::uuid, $2::uuid, $3::"TypeAlert", $4::"AlertStatus")',
     id,
     data.productId,
     type,
@@ -141,7 +141,7 @@ export async function seedPurchaseOrder(data: {
 
   await prisma.$executeRawUnsafe(
     `INSERT INTO purchase_orders (id, product_id, quantity, supplier_id, status, source, alert_id, rejection_reason)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+     VALUES ($1::uuid, $2::uuid, $3::int, $4::uuid, $5::"PurchaseOrderStatus", $6::"PurchaseOrderSource", $7::uuid, $8)`,
     id,
     data.productId,
     quantity,

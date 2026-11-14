@@ -16,11 +16,14 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('/ (GET)', async () => {
+    const response = await request(app.getHttpServer()).get('/').expect(200);
+
+    expect(response.body.message).toBe(
+      'Welcome to the Inventory Management System API!',
+    );
+    expect(response.body.version).toBe('1.0.0');
+    expect(response.body.timestamp).toBeDefined();
   });
 
   afterEach(async () => {

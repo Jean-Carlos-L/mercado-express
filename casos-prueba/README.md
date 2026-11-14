@@ -5,7 +5,20 @@
 **Commit auditado:** `0f8745c` (rama `master`)
 **Alcance:** 110 casos de prueba implementados en 15 archivos de test.
 
-> Este documento y los reportes de suite se generaron sin modificar código fuente ni archivos fuera de `casos-prueba/`. La base de datos usada fue `mercado_express_test` en el contenedor PostgreSQL del propio repositorio.
+> **Actualización (2026-11-14):** los fallos documentados en este informe fueron corregidos. El estado vigente es **110/110 PASS** (53 unitarias, 29 integración, 28 E2E). Ver [`reporte-revalidacion.md`](./reporte-revalidacion.md). Las matrices de los reportes de suite conservan el estado histórico de la primera auditoría.
+
+> Este documento y los reportes de suite se generaron sin modificar código fuente ni archivos fuera de `casos-prueba/` en la auditoría inicial. La base de datos usada fue `mercado_express_test` en el contenedor PostgreSQL del propio repositorio.
+
+---
+
+## Estado vigente tras correcciones
+
+| Suite | Antes | Después |
+| :--- | ---: | ---: |
+| Unitaria | 53/53 PASS | **53/53 PASS** |
+| Integración | 3/29 PASS | **29/29 PASS** |
+| E2E | 4/28 PASS | **28/28 PASS** |
+| **Total** | **60/110 PASS** | **110/110 PASS** |
 
 ---
 
@@ -44,6 +57,7 @@
 
 | Documento | Contenido |
 | :--- | :--- |
+| [`reporte-revalidacion.md`](./reporte-revalidacion.md) | Correcciones aplicadas y estado vigente: 110/110 PASS. |
 | [`reporte-unit.md`](./reporte-unit.md) | Matriz de 53 casos unitarios, hallazgos y entorno. |
 | [`reporte-integration.md`](./reporte-integration.md) | Matriz de 29 casos de integración, hallazgos y entorno. |
 | [`reporte-e2e.md`](./reporte-e2e.md) | Matriz de 28 casos E2E, hallazgos y entorno. |

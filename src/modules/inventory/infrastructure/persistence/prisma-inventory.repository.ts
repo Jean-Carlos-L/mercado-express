@@ -24,8 +24,8 @@ export class PrismaInventoryRepository implements InventoryRepository {
     const result = await this.prisma.$transaction(async (tx) => {
       const affectedRows = await tx.$executeRawUnsafe(
         `UPDATE products
-         SET current_stock = current_stock + $1
-         WHERE id = $2 AND (current_stock + $1) >= 0`,
+         SET current_stock = current_stock + $1::int
+         WHERE id = $2::uuid AND (current_stock + $1::int) >= 0`,
         params.quantity,
         params.productId,
       );

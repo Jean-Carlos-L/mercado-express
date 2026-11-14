@@ -4,6 +4,8 @@
 **Comando ejecutado:** `npm run test:unit -- --verbose` (`jest --testPathPatterns='src/.*(?<!\.integration)\.spec\.ts$'`)
 **Resultado global:** 7 suites, 53 casos, **53 PASS / 0 FAIL**.
 
+> **Estado histórico:** esta matriz refleja la auditoría inicial. Tras las correcciones documentadas en [`reporte-revalidacion.md`](./reporte-revalidacion.md), la suite sigue en 53/53 PASS.
+
 ---
 
 ## 1. Matriz de Casos de Prueba

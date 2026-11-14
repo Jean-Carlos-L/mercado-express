@@ -4,6 +4,8 @@
 **Comando ejecutado:** `npm run test:e2e -- --verbose`
 **Resultado global:** 4 suites, 28 casos, **4 PASS / 24 FAIL**.
 
+> **Estado histórico:** esta matriz refleja la auditoría inicial, antes de corregir los helpers de seed y la expectativa del endpoint raíz. Tras las correcciones documentadas en [`reporte-revalidacion.md`](./reporte-revalidacion.md), la suite está en **28/28 PASS**.
+
 > 23 fallos se deben a F-01 (helpers de seed con UUID como `text`); 1 fallo es una expectativa obsoleta en `test/app.e2e-spec.ts` (F-03).
 
 ---

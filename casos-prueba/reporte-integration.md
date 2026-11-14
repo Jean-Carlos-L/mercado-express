@@ -8,6 +8,8 @@ npm run test:integration -- --verbose
 ```
 **Resultado global:** 4 suites, 29 casos, **3 PASS / 26 FAIL**.
 
+> **Estado histórico:** esta matriz refleja la auditoría inicial, antes de corregir los helpers de seed y la consulta raw. Tras las correcciones documentadas en [`reporte-revalidacion.md`](./reporte-revalidacion.md), la suite está en **29/29 PASS**.
+
 > Todos los fallos de esta suite ocurren en la fase de *seed* (`test/helpers/test-database.helper.ts`) antes de ejercitar el repositorio bajo prueba. La causa raíz es el envío de UUID como `text` en `$executeRawUnsafe` (ver Hallazgo F-01).
 
 ---
