@@ -255,7 +255,7 @@ describe('Purchase Orders (e2e)', () => {
         currentStock: 3,
         minStock: 5,
       });
-      const alert = await seedAlert({
+      await seedAlert({
         productId: product.id,
         status: 'ACTIVE',
       });

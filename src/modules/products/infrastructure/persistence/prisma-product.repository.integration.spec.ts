@@ -107,7 +107,7 @@ describe('Integration: PrismaProductRepository', () => {
     it('should return product by sku', async () => {
       const category = await seedCategory();
       const supplier = await seedSupplier();
-      const seeded = await seedProduct({
+      await seedProduct({
         categoryId: category.id,
         supplierId: supplier.id,
         sku: 'FIND-BY-SKU',
