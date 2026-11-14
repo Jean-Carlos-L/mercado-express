@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ci-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Pruebas (unitarias, integración y E2E)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mercado_express_test?schema=public
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: mercado_express_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d mercado_express_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Generar cliente Prisma
+        run: npx prisma generate
+
+      - name: Aplicar migraciones en la BD de prueba
+        run: npm run test:integration:setup
+
+      - name: Pruebas unitarias
+        run: npm run test:unit
+
+      - name: Pruebas de integración
+        # --runInBand evita interferencia entre archivos que comparten la BD
+        # y limpian los datos en beforeEach. No requiere modificar package.json.
+        run: npm run test:integration -- --runInBand
+
+      - name: Pruebas E2E
+        run: npm run test:e2e
